@@ -6,6 +6,7 @@ export interface StockHolding {
     symbol: string;
     purchasePrice: number;
     quantity: number;
+    sector: string;
   }
   
   export interface PortfolioTableProps {

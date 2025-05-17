@@ -1,4 +1,4 @@
-// data/portfolio.ts
+// portfolio.ts
 import type { StockHolding } from './types';
 
 export const portfolioData: StockHolding[] = [
@@ -8,6 +8,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'TCS.NS',
     purchasePrice: 3500,
     quantity: 10,
+    sector: 'Technology',
   },
   {
     stockName: 'INFY',
@@ -15,6 +16,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'INFY.NS',
     purchasePrice: 1400,
     quantity: 20,
+    sector: 'Technology',
   },
   {
     stockName: 'HDFC Bank',
@@ -22,6 +24,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'HDFCBANK.NS',
     purchasePrice: 1500,
     quantity: 15,
+    sector: 'Financials',
   },
   {
     stockName: 'Reliance Industries',
@@ -29,6 +32,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'RELIANCE.NS',
     purchasePrice: 2400,
     quantity: 12,
+    sector: 'Energy',
   },
   {
     stockName: 'ICICI Bank',
@@ -36,6 +40,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'ICICIBANK.NS',
     purchasePrice: 700,
     quantity: 25,
+    sector: 'Financials',
   },
   {
     stockName: 'Larsen & Toubro',
@@ -43,6 +48,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'LT.NS',
     purchasePrice: 2100,
     quantity: 8,
+    sector: 'Infrastructure',
   },
   {
     stockName: 'Maruti Suzuki',
@@ -50,6 +56,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'MARUTI.NS',
     purchasePrice: 8000,
     quantity: 5,
+    sector: 'Automobile',
   },
   {
     stockName: 'Bharti Airtel',
@@ -57,6 +64,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'BHARTIARTL.NS',
     purchasePrice: 600,
     quantity: 30,
+    sector: 'Telecom',
   },
   {
     stockName: 'Kotak Mahindra Bank',
@@ -64,6 +72,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'KOTAKBANK.NS',
     purchasePrice: 1900,
     quantity: 10,
+    sector: 'Financials',
   },
   {
     stockName: 'Axis Bank',
@@ -71,6 +80,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'AXISBANK.NS',
     purchasePrice: 850,
     quantity: 18,
+    sector: 'Financials',
   },
   {
     stockName: 'Asian Paints',
@@ -78,6 +88,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'ASIANPAINT.NS',
     purchasePrice: 3200,
     quantity: 7,
+    sector: 'Consumer Goods',
   },
   {
     stockName: 'Titan Company',
@@ -85,6 +96,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'TITAN.NS',
     purchasePrice: 2500,
     quantity: 9,
+    sector: 'Consumer Goods',
   },
   {
     stockName: 'SBI Life Insurance',
@@ -92,6 +104,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'SBILIFE.NS',
     purchasePrice: 1100,
     quantity: 14,
+    sector: 'Financials',
   },
   {
     stockName: 'Bajaj Housing Finance',
@@ -99,6 +112,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'BAJAJHLDNG.NS',
     purchasePrice: 600,
     quantity: 20,
+    sector: 'Financials',
   },
   {
     stockName: 'IDFC Bank',
@@ -106,6 +120,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'IDFCFIRSTB.NS',
     purchasePrice: 55,
     quantity: 100,
+    sector: 'Financials',
   },
   {
     stockName: 'KPIT Technologies',
@@ -113,6 +128,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'KPITTECH.NS',
     purchasePrice: 320,
     quantity: 25,
+    sector: 'Technology',
   },
   {
     stockName: 'LTI Mindtree',
@@ -120,6 +136,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'LTI.NS',
     purchasePrice: 3200,
     quantity: 10,
+    sector: 'Technology',
   },
   {
     stockName: 'Dmart',
@@ -127,6 +144,7 @@ export const portfolioData: StockHolding[] = [
     symbol: 'DMART.NS',
     purchasePrice: 2800,
     quantity: 8,
+    sector: 'Retail',
   },
   {
     stockName: 'Tata Consumer Products',
@@ -134,5 +152,6 @@ export const portfolioData: StockHolding[] = [
     symbol: 'TATACONSUM.NS',
     purchasePrice: 700,
     quantity: 15,
+    sector: 'Consumer Goods',
   },
 ];

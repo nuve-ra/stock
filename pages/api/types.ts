@@ -1,12 +1,13 @@
-// types.ts (or inside your component file)
+// types.ts
 export interface StockHolding {
+    sector: string;
     stockName: string;
     exchange: string;
     symbol: string;
     purchasePrice: number;
     quantity: number;
-    cmp?: number;               // Current Market Price (fetched later)
-    peRatio?: number;           // P/E Ratio (fetched later)
-    latestEarnings?: string;    // Earnings date or info (fetched later)
+    cmp?: number;               
+    peRatio?: number;           
+    latestEarnings?: string;    
   }
   

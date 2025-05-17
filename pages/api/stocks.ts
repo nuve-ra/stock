@@ -1,4 +1,4 @@
-// pages/api/stocks.ts
+// stocks.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import yahooFinance from 'yahoo-finance2';
 
