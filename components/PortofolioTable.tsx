@@ -9,7 +9,7 @@ type LiveStock = {
   peRatio: number | null;
   earningsTimestamp: number | null;
 };
-type LiveStockAPIResponse = LiveStock[];
+//type LiveStockAPIResponse = LiveStock[];
 
 type HistoricalStockAPIResponse = Array<{
   symbol: string;
@@ -44,7 +44,7 @@ type LiveStockData = {
 
 interface PortfolioTableProps {
   portfolioData: StockHolding[];
-  stockData: Record<string, any>;
+  stockData: Record<string, unknown>;
 }
 
 const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
