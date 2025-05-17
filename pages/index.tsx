@@ -4,14 +4,6 @@ import PortfolioTable from '../components/PortofolioTable';
 import { portfolioData } from './api/portfolioData';
 import { format } from 'date-fns';
 
-interface StockHolding {
-  symbol: string;
-  stockName: string;
-  purchasePrice: number;
-  quantity: number;
-  exchange: string;
-}
-
 interface LiveStock {
   symbol: string;
   regularMarketPrice: number;
@@ -41,8 +33,8 @@ export default function Home() {
           cmp: stock.regularMarketPrice,
           peRatio: stock.trailingPE,
           latestEarnings: stock.earningsTimestamp != null
-          ? format(new Date(stock.earningsTimestamp * 1000), 'MMM dd yyyy')
-          : '-',
+            ? format(new Date(stock.earningsTimestamp * 1000), 'MMM dd yyyy')
+            : '-',
         };
       });
 

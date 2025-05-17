@@ -3,13 +3,25 @@ import axios from 'axios';
 import { StockHolding } from '../pages/api/types';
 import { format } from 'date-fns';
 
-type LiveStockData = {
-  [symbol: string]: {
-    cmp: number;
-    peRatio: number | null;
-    latestEarnings: string | null;
-  };
+type LiveStock = {
+  symbol: string;
+  cmp: number;
+  peRatio: number | null;
+  earningsTimestamp: number | null;
 };
+type LiveStockAPIResponse = LiveStock[];
+
+type HistoricalStockAPIResponse = Array<{
+  symbol: string;
+  history: Array<{
+    date: string;
+    open: number;
+    close: number;
+    high: number;
+    low: number;
+    volume: number;
+  }>;
+}>;
 
 type HistoricalDataMap = {
   [symbol: string]: Array<{
@@ -22,12 +34,20 @@ type HistoricalDataMap = {
   }>;
 };
 
+type LiveStockData = {
+  [symbol: string]: {
+    cmp: number;
+    peRatio: number | null;
+    latestEarnings: string | null;
+  };
+};
+
 interface PortfolioTableProps {
   portfolioData: StockHolding[];
   stockData: Record<string, any>;
 }
 
-const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockData }) => {
+const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
   const [liveData, setLiveData] = useState<LiveStockData>({});
   const [historicalData, setHistoricalData] = useState<HistoricalDataMap>({});
   const [selectedSector, setSelectedSector] = useState<string>('All Sectors');
@@ -39,7 +59,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
         const response = await axios.post('/api/stocks', { symbols });
 
         const mappedData: LiveStockData = {};
-        response.data.forEach((stock: any) => {
+        response.data.forEach((stock: LiveStock) => {
           mappedData[stock.symbol] = {
             cmp: stock.cmp ?? 0,
             peRatio: stock.peRatio ?? null,
@@ -65,7 +85,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
         });
 
         const historicalMap: HistoricalDataMap = {};
-        response.data.forEach((item: any) => {
+        response.data.forEach((item: HistoricalStockAPIResponse[number]) => {
           historicalMap[item.symbol] = item.history;
         });
 
@@ -142,7 +162,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {filteredPortfolioData.map((stock, index) => {
+              {filteredPortfolioData.map((stock) => {
                 const investment = stock.purchasePrice * stock.quantity;
                 const portfolioPercent = ((investment / totalInvestment) * 100).toFixed(2);
                 const cmp = liveData[stock.symbol]?.cmp ?? 0;
@@ -180,7 +200,6 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
         </div>
       </div>
 
-      
       <div className="mt-6 space-y-4 md:hidden">
         {filteredPortfolioData.map((stock) => {
           const investment = stock.purchasePrice * stock.quantity;
@@ -199,25 +218,23 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
               className="border rounded-xl shadow-lg p-4 bg-white"
             >
               <h3 className="font-semibold text-lg text-blue-600 mb-3">{stock.stockName}</h3>
-              <p><strong> Purchase Price:</strong> ₹{stock.purchasePrice}</p>
-              <p><strong> Quantity:</strong> {stock.quantity}</p>
-              <p><strong> Investment:</strong> ₹{investment.toFixed(2)}</p>
-              <p><strong> Portfolio %:</strong> {portfolioPercent}%</p>
-              <p><strong> Exchange:</strong> {stock.exchange}</p>
-              <p><strong> CMP:</strong> ₹{cmp.toFixed(2)}</p>
-              <p><strong> Present Value:</strong> ₹{presentValue.toFixed(2)}</p>
-              <p className={`${gainClass} font-semibold`}>
-                <strong> Gain/Loss:</strong> ₹{gainLoss.toFixed(2)}
-              </p>
-              <p><strong> P/E Ratio:</strong> {peRatio}</p>
-              <p><strong> Latest Earnings:</strong> {latestEarnings}</p>
-              <p><strong> History Points:</strong> {historicalPoints}</p>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
+              <p><strong>Price:</strong> {stock.purchasePrice}</p>
+                      <p><strong>Quantity:</strong> {stock.quantity}</p>
+                      <p><strong>Investment:</strong> {investment.toFixed(2)}</p>
+                      <p><strong>% of Total:</strong> {portfolioPercent}%</p>
+                      <p><strong>Exchange:</strong> {stock.exchange}</p>
+                      <p><strong>CMP:</strong> {cmp.toFixed(2)}</p>
+                      <p><strong>Value:</strong> {presentValue.toFixed(2)}</p>
+                      <p className={gainClass}><strong>Gain/Loss:</strong> {gainLoss.toFixed(2)}</p>
+                      <p><strong>P/E:</strong> {peRatio}</p>
+                      <p><strong>Earnings:</strong> {latestEarnings}</p>
+                      <p><strong>History Points:</strong> {historicalPoints}</p>
+                      </div>
+                      );
+                      })}
+                      </div>
+                      </div>
+                      );
+                      };
 
-export default PortfolioTable;
+                      export default PortfolioTable;
