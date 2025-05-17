@@ -79,10 +79,8 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
     fetchHistoricalData();
   }, [portfolioData]);
 
-  //sectors
   const sectors = Array.from(new Set(portfolioData.map(stock => stock.sector))).sort();
 
-  // filter sector
   const filteredPortfolioData =
     selectedSector === 'All Sectors'
       ? portfolioData
@@ -94,27 +92,25 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
   );
 
   return (
-    <div>
-     
-      <nav className="bg-gradient-to-r from-gray-700 via-gray-500 to-gray-700 text-white px-4 py-3 rounded shadow-lg flex justify-between items-center">
-        <h1 className="text-lg font-semibold">📊 My Portfolio Dashboard</h1>
-        <ul className="flex space-x-4 text-sm">
+    <div className="max-w-screen-xl mx-auto p-4">
+      <nav className="bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-500 text-white px-6 py-4 rounded-xl shadow-md flex justify-between items-center">
+        <h1 className="text-xl font-bold">📊 My Portfolio Dashboard</h1>
+        <ul className="flex space-x-6 text-sm">
           <li className="hover:underline cursor-pointer">Home</li>
           <li className="hover:underline cursor-pointer">Add Stock</li>
           <li className="hover:underline cursor-pointer">Settings</li>
         </ul>
       </nav>
 
-  
-      <div className="mt-4 mb-2">
-        <label htmlFor="sector-select" className="mr-2 font-medium">
+      <div className="mt-6">
+        <label htmlFor="sector-select" className="font-medium text-gray-700 mr-3">
           Filter by Sector:
         </label>
         <select
           id="sector-select"
           value={selectedSector}
           onChange={(e) => setSelectedSector(e.target.value)}
-          className="border border-gray-300 rounded px-2 py-1"
+          className="border border-gray-300 rounded px-3 py-2 shadow-sm"
         >
           <option value="All Sectors">All Sectors</option>
           {sectors.map((sector) => (
@@ -125,106 +121,97 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
         </select>
       </div>
 
-     
-      <div className="overflow-x-auto rounded-xl shadow-md border border-gray-300 hidden md:block">
-        <img src="/finance.png" alt="Portfolio" className="w-6 h-6 rounded-full filter drop-shadow-lg" />
-        <h2 className="text-xl font-semibold border border-gray-400 rounded-lg px-2 py-1 text-blue-500 filter drop-shadow-[0_4px_6px_rgba(59,130,246,0.6)] mb-2">
-          Stock Portfolio
-        </h2>
+      <div className="hidden md:block mt-6">
+        <h2 className="text-2xl font-semibold text-blue-600 mb-4">📈 Stock Portfolio</h2>
+        <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 text-sm">
+            <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+              <tr>
+                <th className="px-4 py-3 text-left">Stock</th>
+                <th className="px-4 py-3">Price</th>
+                <th className="px-4 py-3">Qty</th>
+                <th className="px-4 py-3">Investment</th>
+                <th className="px-4 py-3">% of Total</th>
+                <th className="px-4 py-3">Exchange</th>
+                <th className="px-4 py-3">CMP</th>
+                <th className="px-4 py-3">Value</th>
+                <th className="px-4 py-3">Gain/Loss</th>
+                <th className="px-4 py-3">P/E</th>
+                <th className="px-4 py-3">Earnings</th>
+                <th className="px-4 py-3">History</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {filteredPortfolioData.map((stock, index) => {
+                const investment = stock.purchasePrice * stock.quantity;
+                const portfolioPercent = ((investment / totalInvestment) * 100).toFixed(2);
+                const cmp = liveData[stock.symbol]?.cmp ?? 0;
+                const peRatio = liveData[stock.symbol]?.peRatio ?? '-';
+                const latestEarnings = liveData[stock.symbol]?.latestEarnings ?? '-';
+                const presentValue = cmp * stock.quantity;
+                const gainLoss = presentValue - investment;
+                const gainClass = gainLoss >= 0 ? 'text-green-600' : 'text-red-600';
+                const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
 
-        <table className="min-w-full text-sm text-gray-800">
-          <thead className="bg-gray-100 text-xs text-gray-600 uppercase tracking-wider">
-            <tr>
-              <th className="px-4 py-3 text-left">Particulars</th>
-              <th className="px-4 py-3">Purchase Price</th>
-              <th className="px-4 py-3">Quantity</th>
-              <th className="px-4 py-3">Investment</th>
-              <th className="px-4 py-3">Portfolio (%)</th>
-              <th className="px-4 py-3">Exchange</th>
-              <th className="px-4 py-3">CMP</th>
-              <th className="px-4 py-3">Present Value</th>
-              <th className="px-4 py-3">Gain/Loss</th>
-
-              
-              <th className="px-4 py-3 hidden sm:table-cell">P/E Ratio</th>
-              <th className="px-4 py-3 hidden sm:table-cell">Latest Earnings</th>
-              <th className="px-4 py-3 hidden sm:table-cell">History Points</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPortfolioData.map((stock, index) => {
-              const investment = stock.purchasePrice * stock.quantity;
-              const portfolioPercent = ((investment / totalInvestment) * 100).toFixed(2);
-
-              const cmp = liveData[stock.symbol]?.cmp ?? 0;
-              const peRatio = liveData[stock.symbol]?.peRatio ?? '-';
-              const latestEarnings = liveData[stock.symbol]?.latestEarnings ?? '-';
-
-              const presentValue = cmp * stock.quantity;
-              const gainLoss = presentValue - investment;
-              const gainClass = gainLoss >= 0 ? 'text-green-600' : 'text-red-600';
-
-              const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
-
-              return (
-                <tr
-                  key={stock.symbol}
-                  className={`border-t ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-yellow-50`}
-                >
-                  <td className="px-4 py-3 font-medium">{stock.stockName}</td>
-                  <td className="px-4 py-3 text-center">{stock.purchasePrice}</td>
-                  <td className="px-4 py-3 text-center">{stock.quantity}</td>
-                  <td className="px-4 py-3 text-center">{investment.toFixed(2)}</td>
-                  <td className="px-4 py-3 text-center">{portfolioPercent}%</td>
-                  <td className="px-4 py-3 text-center">{stock.exchange}</td>
-                  <td className="px-4 py-3 text-center">{cmp.toFixed(2)}</td>
-                  <td className="px-4 py-3 text-center">{presentValue.toFixed(2)}</td>
-                  <td className={`px-4 py-3 text-center font-semibold ${gainClass}`}>
-                    {gainLoss.toFixed(2)}
-                  </td>
-                  <td className="px-4 py-3 text-center hidden sm:table-cell">{peRatio}</td>
-                  <td className="px-4 py-3 text-center hidden sm:table-cell">{latestEarnings}</td>
-                  <td className="px-4 py-3 text-center hidden sm:table-cell">{historicalPoints}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr
+                    key={stock.symbol}
+                    className="hover:bg-yellow-50"
+                  >
+                    <td className="px-4 py-3 font-medium">{stock.stockName}</td>
+                    <td className="px-4 py-3 text-center">{stock.purchasePrice}</td>
+                    <td className="px-4 py-3 text-center">{stock.quantity}</td>
+                    <td className="px-4 py-3 text-center">{investment.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-center">{portfolioPercent}%</td>
+                    <td className="px-4 py-3 text-center">{stock.exchange}</td>
+                    <td className="px-4 py-3 text-center">{cmp.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-center">{presentValue.toFixed(2)}</td>
+                    <td className={`px-4 py-3 text-center font-semibold ${gainClass}`}>
+                      {gainLoss.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3 text-center">{peRatio}</td>
+                    <td className="px-4 py-3 text-center">{latestEarnings}</td>
+                    <td className="px-4 py-3 text-center">{historicalPoints}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Card view for small screens */}
-      <div className="mt-4 space-y-4 md:hidden">
+      {/* Mobile Card View */}
+      <div className="mt-6 space-y-4 md:hidden">
         {filteredPortfolioData.map((stock) => {
           const investment = stock.purchasePrice * stock.quantity;
           const portfolioPercent = ((investment / totalInvestment) * 100).toFixed(2);
-
           const cmp = liveData[stock.symbol]?.cmp ?? 0;
           const peRatio = liveData[stock.symbol]?.peRatio ?? '-';
           const latestEarnings = liveData[stock.symbol]?.latestEarnings ?? '-';
-
           const presentValue = cmp * stock.quantity;
           const gainLoss = presentValue - investment;
           const gainClass = gainLoss >= 0 ? 'text-green-600' : 'text-red-600';
-
           const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
 
           return (
             <div
               key={stock.symbol}
-              className="border rounded-lg shadow-md p-4 bg-white"
+              className="border rounded-xl shadow-lg p-4 bg-white"
             >
-              <h3 className="font-semibold text-lg mb-2">{stock.stockName}</h3>
-              <p><strong>Purchase Price:</strong> {stock.purchasePrice}</p>
-              <p><strong>Quantity:</strong> {stock.quantity}</p>
-              <p><strong>Investment:</strong> {investment.toFixed(2)}</p>
-              <p><strong>Portfolio %:</strong> {portfolioPercent}%</p>
-              <p><strong>Exchange:</strong> {stock.exchange}</p>
-              <p><strong>CMP:</strong> {cmp.toFixed(2)}</p>
-              <p><strong>Present Value:</strong> {presentValue.toFixed(2)}</p>
-              <p className={`${gainClass} font-semibold`}><strong>Gain/Loss:</strong> {gainLoss.toFixed(2)}</p>
-              <p><strong>P/E Ratio:</strong> {peRatio}</p>
-              <p><strong>Latest Earnings:</strong> {latestEarnings}</p>
-              <p><strong>History Points:</strong> {historicalPoints}</p>
+              <h3 className="font-semibold text-lg text-blue-600 mb-3">{stock.stockName}</h3>
+              <p><strong>📌 Purchase Price:</strong> ₹{stock.purchasePrice}</p>
+              <p><strong>📦 Quantity:</strong> {stock.quantity}</p>
+              <p><strong>💰 Investment:</strong> ₹{investment.toFixed(2)}</p>
+              <p><strong>📊 Portfolio %:</strong> {portfolioPercent}%</p>
+              <p><strong>🏦 Exchange:</strong> {stock.exchange}</p>
+              <p><strong>⚡ CMP:</strong> ₹{cmp.toFixed(2)}</p>
+              <p><strong>📈 Present Value:</strong> ₹{presentValue.toFixed(2)}</p>
+              <p className={`${gainClass} font-semibold`}>
+                <strong>🔁 Gain/Loss:</strong> ₹{gainLoss.toFixed(2)}
+              </p>
+              <p><strong>📐 P/E Ratio:</strong> {peRatio}</p>
+              <p><strong>🗓 Latest Earnings:</strong> {latestEarnings}</p>
+              <p><strong>🕒 History Points:</strong> {historicalPoints}</p>
             </div>
           );
         })}
