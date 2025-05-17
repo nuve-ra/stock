@@ -180,7 +180,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
         </div>
       </div>
 
-      {/* Mobile Card View */}
+      
       <div className="mt-6 space-y-4 md:hidden">
         {filteredPortfolioData.map((stock) => {
           const investment = stock.purchasePrice * stock.quantity;
@@ -199,19 +199,19 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
               className="border rounded-xl shadow-lg p-4 bg-white"
             >
               <h3 className="font-semibold text-lg text-blue-600 mb-3">{stock.stockName}</h3>
-              <p><strong>📌 Purchase Price:</strong> ₹{stock.purchasePrice}</p>
-              <p><strong>📦 Quantity:</strong> {stock.quantity}</p>
-              <p><strong>💰 Investment:</strong> ₹{investment.toFixed(2)}</p>
-              <p><strong>📊 Portfolio %:</strong> {portfolioPercent}%</p>
-              <p><strong>🏦 Exchange:</strong> {stock.exchange}</p>
-              <p><strong>⚡ CMP:</strong> ₹{cmp.toFixed(2)}</p>
-              <p><strong>📈 Present Value:</strong> ₹{presentValue.toFixed(2)}</p>
+              <p><strong> Purchase Price:</strong> ₹{stock.purchasePrice}</p>
+              <p><strong> Quantity:</strong> {stock.quantity}</p>
+              <p><strong> Investment:</strong> ₹{investment.toFixed(2)}</p>
+              <p><strong> Portfolio %:</strong> {portfolioPercent}%</p>
+              <p><strong> Exchange:</strong> {stock.exchange}</p>
+              <p><strong> CMP:</strong> ₹{cmp.toFixed(2)}</p>
+              <p><strong> Present Value:</strong> ₹{presentValue.toFixed(2)}</p>
               <p className={`${gainClass} font-semibold`}>
-                <strong>🔁 Gain/Loss:</strong> ₹{gainLoss.toFixed(2)}
+                <strong> Gain/Loss:</strong> ₹{gainLoss.toFixed(2)}
               </p>
-              <p><strong>📐 P/E Ratio:</strong> {peRatio}</p>
-              <p><strong>🗓 Latest Earnings:</strong> {latestEarnings}</p>
-              <p><strong>🕒 History Points:</strong> {historicalPoints}</p>
+              <p><strong> P/E Ratio:</strong> {peRatio}</p>
+              <p><strong> Latest Earnings:</strong> {latestEarnings}</p>
+              <p><strong> History Points:</strong> {historicalPoints}</p>
             </div>
           );
         })}
