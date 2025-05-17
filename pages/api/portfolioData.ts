@@ -1,4 +1,4 @@
-// portfolio.ts
+// Schema or Data
 import type { StockHolding } from './types';
 
 export const portfolioData: StockHolding[] = [

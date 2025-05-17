@@ -1,7 +1,7 @@
 import PortfolioTable from '../components/PortofolioTable';
 import { portfolioData } from '../pages/api/portfolioData';
 
-const stockData = {}; // You need to fetch or prepare this correctly
+const stockData = {}; 
 
 export default function PortfolioPage() {
   return (

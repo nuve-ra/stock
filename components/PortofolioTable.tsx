@@ -79,10 +79,10 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
     fetchHistoricalData();
   }, [portfolioData]);
 
-  // Extract unique sectors from portfolioData
+  //sectors
   const sectors = Array.from(new Set(portfolioData.map(stock => stock.sector))).sort();
 
-  // Filter stocks by selected sector
+  // filter sector
   const filteredPortfolioData =
     selectedSector === 'All Sectors'
       ? portfolioData
@@ -95,7 +95,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
 
   return (
     <div>
-      {/* Navbar */}
+     
       <nav className="bg-gradient-to-r from-gray-700 via-gray-500 to-gray-700 text-white px-4 py-3 rounded shadow-lg flex justify-between items-center">
         <h1 className="text-lg font-semibold">📊 My Portfolio Dashboard</h1>
         <ul className="flex space-x-4 text-sm">
@@ -105,7 +105,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
         </ul>
       </nav>
 
-      {/* Sector dropdown */}
+  
       <div className="mt-4 mb-2">
         <label htmlFor="sector-select" className="mr-2 font-medium">
           Filter by Sector:
@@ -125,7 +125,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
         </select>
       </div>
 
-      {/* Table view for md and above */}
+     
       <div className="overflow-x-auto rounded-xl shadow-md border border-gray-300 hidden md:block">
         <img src="/finance.png" alt="Portfolio" className="w-6 h-6 rounded-full filter drop-shadow-lg" />
         <h2 className="text-xl font-semibold border border-gray-400 rounded-lg px-2 py-1 text-blue-500 filter drop-shadow-[0_4px_6px_rgba(59,130,246,0.6)] mb-2">
@@ -145,7 +145,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData, stockDat
               <th className="px-4 py-3">Present Value</th>
               <th className="px-4 py-3">Gain/Loss</th>
 
-              {/* Hide these on small screens */}
+              
               <th className="px-4 py-3 hidden sm:table-cell">P/E Ratio</th>
               <th className="px-4 py-3 hidden sm:table-cell">Latest Earnings</th>
               <th className="px-4 py-3 hidden sm:table-cell">History Points</th>

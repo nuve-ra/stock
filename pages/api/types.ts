@@ -1,4 +1,4 @@
-// types.ts
+
 export interface StockHolding {
     sector: string;
     stockName: string;

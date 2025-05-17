@@ -1,4 +1,4 @@
-// data/types.ts
+// types.ts
 
 export interface StockHolding {
     stockName: string;
