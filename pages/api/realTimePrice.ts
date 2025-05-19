@@ -1,28 +1,35 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import yahooFinance from 'yahoo-finance2';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-type realTimeStockData = {
-  symbol: string;
-  cmp: number;
-  peRatio: number | null;
-  earningsTimestamp: number | null;
-};
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const { symbols } = req.body;
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
+    // Use default symbols if none are provided
+    const finalSymbols = Array.isArray(symbols) && symbols.length > 0
+      ? symbols
+      : ['INFY.NS', 'TCS.NS', 'RELIANCE.NS', 'SBIN.NS', 'HDFCBANK.NS'];
+
+    const results = await Promise.all(
+      finalSymbols.map(async (symbol: string) => {
+        try {
+          const data = await yahooFinance.quote(symbol);
+          return {
+            symbol,
+            cmp: data.regularMarketPrice ?? null,
+            peRatio: data.trailingPE ?? null,
+            earningsTimestamp: data.earningsTimestamp ?? null,
+          };
+        } catch (err) {
+          console.error(`Error fetching ${symbol}:`, err);
+          return { symbol, error: 'Failed to fetch' };
+        }
+      })
+    );
+
+    res.status(200).json(results);
+  } catch (error) {
+    console.error('Error fetching stock data:', error);
+    res.status(500).json({ error: 'Failed to fetch stock data' });
   }
-
-  const { symbols } = req.body;
-
-  console.log('Symbols:', symbols);
-
-  const livePrices: realTimeStockData[] = symbols.map((symbol: string) => ({
-    symbol,
-    cmp: Math.floor(Math.random() * 1000), // mock CMP price
-    peRatio: 20 + Math.random() * 10,
-    earningsTimestamp: Math.floor(Date.now() / 1000),
-  }));
-
-  res.status(200).json(livePrices);
 }

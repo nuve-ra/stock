@@ -2,26 +2,35 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { StockHolding } from '../pages/api/types';
 import { format } from 'date-fns';
+import {portfolioData} from "../pages/api/portfolioData"
 
 type LiveStock = {
   symbol: string;
   cmp: number;
   peRatio: number | null;
   earningsTimestamp: number | null;
+  
 };
+
+type CombinedStock = typeof portfolioData[0] & {
+  cmp: number | null;
+  value: number | null;
+  gainLoss: number | null;
+};
+
 //type LiveStockAPIResponse = LiveStock[];
 
 //
-type HistoricalDataMap = {
-  [symbol: string]: Array<{
-    date: string;
-    open: number;
-    close: number;
-    high: number;
-    low: number;
-    volume: number;
-  }>;
-};
+//type HistoricalDataMap = {
+//  [symbol: string]: Array<{
+//    date: string;
+//    open: number;
+//    close: number;
+//    high: number;
+//    low: number;
+//    volume: number;
+//  }>;
+//};
 
 type LiveStockData = {
   [symbol: string]: {
@@ -31,6 +40,7 @@ type LiveStockData = {
   };
 };
 
+
 interface PortfolioTableProps {
   portfolioData: StockHolding[];
   stockData: Record<string, unknown>;
@@ -39,10 +49,10 @@ interface PortfolioTableProps {
 
 const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
   const [liveData, setLiveData] = useState<LiveStockData>({});
-  const [historicalData, setHistoricalData] = useState<HistoricalDataMap>({});
+  //const [historicalData, setHistoricalData] = useState<HistoricalDataMap>({});
   const [selectedSector, setSelectedSector] = useState<string>('All Sectors');
-
-  useEffect(() => {
+  const [combinedData, setCombinedData] = useState<CombinedStock[]>([]);
+useEffect(() => {
   const fetchLiveStockAPIResponse = async () => {
     try {
       const symbols = portfolioData.map((stock) => stock.symbol);
@@ -52,33 +62,49 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
       response.data.forEach((stock: LiveStock) => {
         mappedData[stock.symbol] = {
           cmp: stock.cmp ?? 0,
-          peRatio: stock.peRatio ?? null,
-          latestEarnings: stock.earningsTimestamp
-            ? format(new Date(stock.earningsTimestamp * 1000), 'MMM dd yyyy')
-            : null,
+         peRatio: stock.peRatio ?? null,
+latestEarnings: typeof stock.earningsTimestamp === 'number'
+  ? format(new Date(stock.earningsTimestamp * 1000), 'MMM dd yyyy')
+  : null,
         };
       });
 
       setLiveData(mappedData);
-    } catch (error) {
-      console.error('Error fetching live stock data:', error);
-    }
-  };
-    
-  const fetchHistoricalData = async () => {
-    try {
-      const res = await axios.get('/api/historicalPrices');
-      setHistoricalData(res.data);
+
+      // ✅ You forgot to define `data` below
+      const combined = portfolioData.map((stock) => {
+        const live = response.data.find((item: LiveStock) => item.symbol === stock.symbol);
+        const cmp = live?.cmp ?? null;
+        const value = cmp !== null ? cmp * stock.quantity : null;
+        const gainLoss = cmp !== null ? value! - stock.purchasePrice * stock.quantity : null;
+        return {
+          ...stock,
+          cmp,
+          value,
+          gainLoss,
+        };
+      });
+      setCombinedData(combined);
+
     } catch (err) {
-      console.error('Failed to fetch historical data:', err);
+      console.error('Error fetching live stock data:', err);
     }
   };
 
+  // const fetchHistoricalData = async () => {
+  //   try {
+  //     const res = await axios.get('/api/historicalPrices');
+  //     setHistoricalData(res.data);
+  //   } catch (err) {
+  //     console.error('Failed to fetch historical data:', err);
+  //   }
+  // };
 
   fetchLiveStockAPIResponse();
+  //fetchHistoricalData();
+
   const interval = setInterval(fetchLiveStockAPIResponse, 6000);
   return () => clearInterval(interval);
-  fetchHistoricalData();
 
 }, [portfolioData]);
 
@@ -154,7 +180,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
                 const presentValue = cmp * stock.quantity;
                 const gainLoss = presentValue - investment;
                 const gainClass = gainLoss >= 0 ? 'text-green-600' : 'text-red-600';
-                const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
+                //const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
 
                 return (
                   <tr
@@ -174,7 +200,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
                     </td>
                     <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{peRatio}</td>
                     <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{latestEarnings}</td>
-                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{historicalPoints}</td>
+                    
                   </tr>
                 );
               })}
@@ -193,7 +219,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
           const presentValue = cmp * stock.quantity;
           const gainLoss = presentValue - investment;
           const gainClass = gainLoss >= 0 ? 'text-green-600' : 'text-red-600';
-          const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
+         // const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
 
           return (
             <div
@@ -211,7 +237,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
                       <p className={gainClass}><strong>Gain/Loss:</strong> {gainLoss.toFixed(2)}</p>
                       <p><strong>P/E:</strong> {peRatio}</p>
                       <p><strong>Earnings:</strong> {latestEarnings}</p>
-                      <p><strong>History Points:</strong> {historicalPoints}</p>
+                    
                       </div>
                       );
                       })}
