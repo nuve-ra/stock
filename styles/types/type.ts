@@ -13,4 +13,11 @@ export interface StockHolding {
     stockData: { [symbol: string]: { cmp: number; peRatio: number | null; latestEarnings: string } };
     portfolioData: StockHolding[];
   }
-  
+  export interface HistoricalPrice {
+  timestamp: string;  
+  value: number;      
+}
+
+export interface HistoricalData {
+  [symbol: string]: HistoricalPrice[];
+}

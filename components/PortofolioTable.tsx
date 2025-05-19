@@ -9,20 +9,9 @@ type LiveStock = {
   peRatio: number | null;
   earningsTimestamp: number | null;
 };
-type LiveStockAPIResponse = LiveStock[];
+//type LiveStockAPIResponse = LiveStock[];
 
-type HistoricalStockAPIResponse = Array<{
-  symbol: string;
-  history: Array<{
-    date: string;
-    open: number;
-    close: number;
-    high: number;
-    low: number;
-    volume: number;
-  }>;
-}>;
-
+//
 type HistoricalDataMap = {
   [symbol: string]: Array<{
     date: string;
@@ -32,6 +21,12 @@ type HistoricalDataMap = {
     low: number;
     volume: number;
   }>;
+};
+type HistoricalData = {
+  [symbol: string]: {
+    timestamp: string;
+    value: number;
+  }[];
 };
 
 type LiveStockData = {
@@ -47,57 +42,51 @@ interface PortfolioTableProps {
   stockData: Record<string, any>;
 }
 
+
 const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
   const [liveData, setLiveData] = useState<LiveStockData>({});
   const [historicalData, setHistoricalData] = useState<HistoricalDataMap>({});
   const [selectedSector, setSelectedSector] = useState<string>('All Sectors');
 
   useEffect(() => {
-    const fetchLiveData = async () => {
-      try {
-        const symbols = portfolioData.map((stock) => stock.symbol);
-        const response = await axios.post('/api/stocks', { symbols });
+  const fetchLiveStockAPIResponse = async () => {
+    try {
+      const symbols = portfolioData.map((stock) => stock.symbol);
+      const response = await axios.post('/api/realTimePrice', { symbols });
 
-        const mappedData: LiveStockData = {};
-        response.data.forEach((stock: LiveStock) => {
-          mappedData[stock.symbol] = {
-            cmp: stock.cmp ?? 0,
-            peRatio: stock.peRatio ?? null,
-            latestEarnings: stock.earningsTimestamp
-              ? format(new Date(stock.earningsTimestamp * 1000), 'MMM dd yyyy')
-              : null,
-          };
-        });
+      const mappedData: LiveStockData = {};
+      response.data.forEach((stock: LiveStock) => {
+        mappedData[stock.symbol] = {
+          cmp: stock.cmp ?? 0,
+          peRatio: stock.peRatio ?? null,
+          latestEarnings: stock.earningsTimestamp
+            ? format(new Date(stock.earningsTimestamp * 1000), 'MMM dd yyyy')
+            : null,
+        };
+      });
 
-        setLiveData(mappedData);
-      } catch (error) {
-        console.error('Error fetching stock data:', error);
-      }
-    };
+      setLiveData(mappedData);
+    } catch (error) {
+      console.error('Error fetching live stock data:', error);
+    }
+  };
+    
+  const fetchHistoricalData = async () => {
+    try {
+      const res = await axios.get('/api/historicalPrices');
+      setHistoricalData(res.data);
+    } catch (err) {
+      console.error('Failed to fetch historical data:', err);
+    }
+  };
 
-    const fetchHistoricalData = async () => {
-      try {
-        const symbols = portfolioData.map(stock => stock.symbol);
-        const response = await axios.post('/api/stocks', {
-          symbols,
-          fetchHistory: true,
-          days: 60,
-        });
 
-        const historicalMap: HistoricalDataMap = {};
-        response.data.forEach((item: HistoricalStockAPIResponse[number]) => {
-          historicalMap[item.symbol] = item.history;
-        });
+  fetchLiveStockAPIResponse();
+  const interval = setInterval(fetchLiveStockAPIResponse, 6000);
+  return () => clearInterval(interval);
+  fetchHistoricalData();
 
-        setHistoricalData(historicalMap);
-      } catch (error) {
-        console.error('Error fetching historical data:', error);
-      }
-    };
-
-    fetchLiveData();
-    fetchHistoricalData();
-  }, [portfolioData]);
+}, [portfolioData]);
 
   const sectors = Array.from(new Set(portfolioData.map(stock => stock.sector))).sort();
 
@@ -130,7 +119,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
           id="sector-select"
           value={selectedSector}
           onChange={(e) => setSelectedSector(e.target.value)}
-          className="border border-gray-300 rounded px-3 py-2 shadow-sm"
+          className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white"
         >
           <option value="All Sectors">All Sectors</option>
           {sectors.map((sector) => (
@@ -146,7 +135,7 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
         <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-              <tr>
+              <tr >
                 <th className="px-4 py-3 text-left">Stock</th>
                 <th className="px-4 py-3">Price</th>
                 <th className="px-4 py-3">Qty</th>
@@ -178,20 +167,20 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
                     key={stock.symbol}
                     className="hover:bg-yellow-50"
                   >
-                    <td className="px-4 py-3 font-medium">{stock.stockName}</td>
-                    <td className="px-4 py-3 text-center">{stock.purchasePrice}</td>
-                    <td className="px-4 py-3 text-center">{stock.quantity}</td>
-                    <td className="px-4 py-3 text-center">{investment.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-center">{portfolioPercent}%</td>
-                    <td className="px-4 py-3 text-center">{stock.exchange}</td>
-                    <td className="px-4 py-3 text-center">{cmp.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-center">{presentValue.toFixed(2)}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{stock.stockName}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{stock.purchasePrice}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{stock.quantity}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{investment.toFixed(2)}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{portfolioPercent}%</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{stock.exchange}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{cmp.toFixed(2)}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{presentValue.toFixed(2)}</td>
                     <td className={`px-4 py-3 text-center font-semibold ${gainClass}`}>
                       {gainLoss.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-center">{peRatio}</td>
-                    <td className="px-4 py-3 text-center">{latestEarnings}</td>
-                    <td className="px-4 py-3 text-center">{historicalPoints}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{peRatio}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{latestEarnings}</td>
+                    <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{historicalPoints}</td>
                   </tr>
                 );
               })}
