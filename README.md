@@ -44,10 +44,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/b
 Setting up the stock data from yahoo-finance2 was one of the challenge,the 
 npm is new to me and it took time to know how it works.
 
-Google-finance on the other changed there policy but luckily yahoo-finance2
+Google-finance on the other hand changed there policy but luckily yahoo-finance2
 covers almost every thing google-finance do.
 
 Lots of silly mistake,that took long time to debug, throughout the making of this
-project given me insight about next.js,yahoo-finance2,some knowledge of atock market.
-im thankful for this opportunity.
+project given me insight about next.js,yahoo-finance2,some knowledge of stock market and its terms.
+Im thankful for this opportunity.
 
