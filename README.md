@@ -38,3 +38,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+
+## Challenges face
+
+Setting up the stock data from yahoo-finance2 was one of the challenge,the 
+npm is new to me and it took time to know how it works.
+
+Google-finance on the other changed there policy but luckily yahoo-finance2
+covers almost every thing google-finance do.
+
+Lots of silly mistake,that took long time to debug, throughout the making of this
+project given me insight about next.js,yahoo-finance2,some knowledge of atock market.
+im thankful for this opportunity.
+

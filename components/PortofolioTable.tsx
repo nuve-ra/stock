@@ -22,12 +22,6 @@ type HistoricalDataMap = {
     volume: number;
   }>;
 };
-type HistoricalData = {
-  [symbol: string]: {
-    timestamp: string;
-    value: number;
-  }[];
-};
 
 type LiveStockData = {
   [symbol: string]: {
@@ -39,7 +33,7 @@ type LiveStockData = {
 
 interface PortfolioTableProps {
   portfolioData: StockHolding[];
-  stockData: Record<string, any>;
+  stockData: Record<string, unknown>;
 }
 
 
