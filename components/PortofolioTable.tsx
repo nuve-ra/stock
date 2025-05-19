@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { StockHolding } from '../pages/api/types';
+import  {StockHolding}  from '../pages/api/types';
 import { format } from 'date-fns';
 import {portfolioData} from "../pages/api/portfolioData"
 
@@ -18,19 +18,6 @@ type CombinedStock = typeof portfolioData[0] & {
   gainLoss: number | null;
 };
 
-//type LiveStockAPIResponse = LiveStock[];
-
-//
-//type HistoricalDataMap = {
-//  [symbol: string]: Array<{
-//    date: string;
-//    open: number;
-//    close: number;
-//    high: number;
-//    low: number;
-//    volume: number;
-//  }>;
-//};
 
 type LiveStockData = {
   [symbol: string]: {
