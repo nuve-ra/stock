@@ -117,25 +117,110 @@ latestEarnings: typeof stock.earningsTimestamp === 'number'
           <li className="hover:underline cursor-pointer">Settings</li>
         </ul>
       </nav>
+// components/PortofolioTable.tsx
 
-      <div className="mt-6">
-        <label htmlFor="sector-select" className="font-medium text-gray-700 mr-3">
-          Filter by Sector:
-        </label>
-        <select
-          id="sector-select"
-          value={selectedSector}
-          onChange={(e) => setSelectedSector(e.target.value)}
-          className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white"
-        >
-          <option value="All Sectors">All Sectors</option>
-          {sectors.map((sector) => (
-            <option key={sector} value={sector}>
-              {sector}
-            </option>
-          ))}
-        </select>
-      </div>
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { StockHolding } from '../pages/api/types'; // Assuming StockHolding is defined here
+import { format } from 'date-fns';
+import { portfolioData } from "../pages/api/portfolioData"; // This import is likely not needed if portfolioData is passed as a prop
+
+
+type LiveStock = {
+  symbol: string;
+  cmp: number;
+  peRatio: number | null;
+  earningsTimestamp: number | null;
+};
+
+type CombinedStock = StockHolding & { // Use StockHolding directly if that's the base type
+  cmp: number | null;
+  value: number | null;
+  gainLoss: number | null;
+};
+
+type LiveStockData = {
+  [symbol: string]: {
+    cmp: number;
+    peRatio: number | null;
+    latestEarnings: string | null;
+  };
+};
+
+interface PortfolioTableProps {
+  portfolioData: StockHolding[];
+  // stockData: Record<string, unknown>; // <-- REMOVE THIS LINE
+  // You no longer need stockData as a prop because PortfolioTable fetches it internally
+}
+
+const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolioData }) => {
+  const [liveData, setLiveData] = useState<LiveStockData>({});
+  const [selectedSector, setSelectedSector] = useState<string>('All Sectors');
+  const [combinedData, setCombinedData] = useState<CombinedStock[]>([]);
+
+  useEffect(() => {
+    const fetchLiveStockAPIResponse = async () => {
+      try {
+        const symbols = portfolioData.map((stock) => stock.symbol);
+        const response = await axios.post('/api/realTimePrice', { symbols });
+
+        const mappedData: LiveStockData = {};
+        response.data.forEach((stock: LiveStock) => {
+          mappedData[stock.symbol] = {
+            cmp: stock.cmp ?? 0,
+            peRatio: stock.peRatio ?? null,
+            latestEarnings: typeof stock.earningsTimestamp === 'number'
+              ? format(new Date(stock.earningsTimestamp * 1000), 'MMM dd, yyyy') // Corrected date format
+              : null,
+          };
+        });
+
+        setLiveData(mappedData);
+
+        const combined = portfolioData.map((stock) => {
+          const live = response.data.find((item: LiveStock) => item.symbol === stock.symbol);
+          const cmp = live?.cmp ?? null;
+          // Ensure stock.quantity and stock.purchasePrice are correctly typed (e.g., number)
+          const value = cmp !== null ? cmp * stock.quantity : null;
+          const gainLoss = cmp !== null ? value! - stock.purchasePrice * stock.quantity : null;
+          return {
+            ...stock,
+            cmp,
+            value,
+            gainLoss,
+          };
+        });
+        setCombinedData(combined);
+
+      } catch (err) {
+        console.error('Error fetching live stock data:', err);
+      }
+    };
+
+    fetchLiveStockAPIResponse();
+
+    const interval = setInterval(fetchLiveStockAPIResponse, 6000);
+    return () => clearInterval(interval);
+
+  }, [portfolioData]); // Depend on portfolioData to re-fetch if it changes
+
+  const sectors = Array.from(new Set(portfolioData.map(stock => stock.sector))).sort();
+
+  const filteredPortfolioData =
+    selectedSector === 'All Sectors'
+      ? portfolioData
+      : portfolioData.filter(stock => stock.sector === selectedSector);
+
+  const totalInvestment = filteredPortfolioData.reduce(
+    (acc, stock) => acc + stock.purchasePrice * stock.quantity,
+    0
+  );
+
+  return (
+    <div className="max-w-screen-xl mx-auto p-4">
+      {/* ... (rest of your component JSX) ... */}
+      {/* Your rendering logic for the table and mobile view seems correct now with liveData */}
+      {/* Ensure that the properties like stock.quantity and stock.purchasePrice are part of StockHolding */}
 
       <div className="hidden md:block mt-6">
         <h2 className="text-2xl font-semibold text-blue-600 mb-4">📈 Stock Portfolio</h2>
@@ -187,7 +272,7 @@ latestEarnings: typeof stock.earningsTimestamp === 'number'
                     </td>
                     <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{peRatio}</td>
                     <td className="border border-gray-300 rounded px-3 py-2 shadow-sm text-black dark:text-black bg-white dark:bg-white">{latestEarnings}</td>
-                    
+
                   </tr>
                 );
               })}
@@ -206,7 +291,7 @@ latestEarnings: typeof stock.earningsTimestamp === 'number'
           const presentValue = cmp * stock.quantity;
           const gainLoss = presentValue - investment;
           const gainClass = gainLoss >= 0 ? 'text-green-600' : 'text-red-600';
-         // const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
+          // const historicalPoints = historicalData[stock.symbol]?.length ?? 0;
 
           return (
             <div
@@ -215,22 +300,22 @@ latestEarnings: typeof stock.earningsTimestamp === 'number'
             >
               <h3 className="font-semibold text-lg text-blue-600 mb-3">{stock.stockName}</h3>
               <p><strong>Price:</strong> {stock.purchasePrice}</p>
-                      <p><strong>Quantity:</strong> {stock.quantity}</p>
-                      <p><strong>Investment:</strong> {investment.toFixed(2)}</p>
-                      <p><strong>% of Total:</strong> {portfolioPercent}%</p>
-                      <p><strong>Exchange:</strong> {stock.exchange}</p>
-                      <p><strong>CMP:</strong> {cmp.toFixed(2)}</p>
-                      <p><strong>Value:</strong> {presentValue.toFixed(2)}</p>
-                      <p className={gainClass}><strong>Gain/Loss:</strong> {gainLoss.toFixed(2)}</p>
-                      <p><strong>P/E:</strong> {peRatio}</p>
-                      <p><strong>Earnings:</strong> {latestEarnings}</p>
-                    
-                      </div>
-                      );
-                      })}
-                      </div>
-                      </div>
-                      );
-                      };
+              <p><strong>Quantity:</strong> {stock.quantity}</p>
+              <p><strong>Investment:</strong> {investment.toFixed(2)}</p>
+              <p><strong>% of Total:</strong> {portfolioPercent}%</p>
+              <p><strong>Exchange:</strong> {stock.exchange}</p>
+              <p><strong>CMP:</strong> {cmp.toFixed(2)}</p>
+              <p><strong>Value:</strong> {presentValue.toFixed(2)}</p>
+              <p className={gainClass}><strong>Gain/Loss:</strong> {gainLoss.toFixed(2)}</p>
+              <p><strong>P/E:</strong> {peRatio}</p>
+              <p><strong>Earnings:</strong> {latestEarnings}</p>
 
-                      export default PortfolioTable;
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default PortfolioTable;
